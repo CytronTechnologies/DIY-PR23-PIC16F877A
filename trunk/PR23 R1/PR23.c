@@ -2,16 +2,16 @@
 //	Author				:CYTRON	
 //	Project				:PR23
 //	Project description	:Simple line follow
-//  Version 			:v1.4
+//  Version 			:v1.5
 //============================================================================================================
 
 //	include
 //============================================================================================================
-#include <pic.h> 
+#include <htc.h> 	//include the hitech header file
 
 //	configuration
 //============================================================================================================
-__CONFIG ( 0x3F32 );
+__CONFIG ( 0x3F32 );	//configuration bits
 
 //	define
 //============================================================================================================
@@ -733,8 +733,14 @@ void read_adc(char config)
 	delay(10000);					// delay after changing configuration 
 	for(i=200;i>0;i-=1)				//looping 200 times for getting average value 
 	{
+		
+#if ((_HTC_VER_MAJOR_ == 9) && (_HTC_VER_MINOR_ <= 80))	//if HITECH v9.80 or below is use
 		ADGO = 1;					//ADGO is the bit 2 of the ADCON0 register
 		while(ADGO==1);				//ADC start, ADGO=0 after finish ADC progress
+#elif ((_HTC_VER_MAJOR_ == 9) && (_HTC_VER_MINOR_ > 80))	//if HITECH v9.81 or above is use
+		GO_DONE = 1;					//ADGO is the bit 2 of the ADCON0 register
+		while(GO_DONE==1);				//ADC start, ADGO=0 after finish ADC progress
+#endif
 		result=ADRESH;
 		result=result<<8;			//shift to left for 8 bit
 		result=result|ADRESL;		//10 bit result from ADC
